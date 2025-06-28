@@ -1,0 +1,63 @@
+-- Task 4: Aggregate Functions and Grouping
+
+-- 1. Count the total number of books in the library
+SELECT COUNT(*) AS total_books FROM Books;
+
+-- 2. Count the number of distinct authors
+SELECT COUNT(DISTINCT author_id) AS total_authors FROM Authors;
+
+-- 3. Find the total number of book copies available in the library
+SELECT SUM(copies_available) AS total_copies_available FROM Books;
+
+-- 4. Get the average number of copies per book
+SELECT AVG(copies_available) AS avg_copies_per_book FROM Books;
+
+-- 5. Count the number of books issued to each member
+SELECT m.name AS member_name, COUNT(ib.issue_id) AS books_issued
+FROM Members m
+JOIN IssuedBooks ib ON m.member_id = ib.member_id
+GROUP BY m.member_id;
+
+-- 6. List authors and the number of books they have written
+SELECT a.name AS author_name, COUNT(b.book_id) AS books_written
+FROM Authors a
+LEFT JOIN Books b ON a.author_id = b.author_id
+GROUP BY a.author_id;
+
+-- 7. Find genres with the average number of copies available
+SELECT genre, AVG(copies_available) AS avg_copies
+FROM Books
+GROUP BY genre;
+
+-- 8. List members who have borrowed more than 2 books
+SELECT m.name AS member_name, COUNT(ib.issue_id) AS books_borrowed
+FROM Members m
+JOIN IssuedBooks ib ON m.member_id = ib.member_id
+GROUP BY m.member_id
+HAVING COUNT(ib.issue_id) > 2;
+
+-- 9. Count how many books were issued each year
+SELECT YEAR(issue_date) AS issue_year, COUNT(*) AS total_issues
+FROM IssuedBooks
+GROUP BY YEAR(issue_date);
+
+-- 10. Show the total number of books issued and returned
+SELECT 
+  COUNT(*) AS total_issued,
+  COUNT(return_date) AS total_returned
+FROM IssuedBooks;
+
+-- 11. Show average number of books written by authors (for those who have at least 1 book)
+SELECT AVG(book_count) AS avg_books_per_author
+FROM (
+  SELECT author_id, COUNT(*) AS book_count
+  FROM Books
+  GROUP BY author_id
+) AS subquery;
+
+-- 12. List authors who have written more than 3 books
+SELECT a.name AS author_name, COUNT(b.book_id) AS total_books
+FROM Authors a
+JOIN Books b ON a.author_id = b.author_id
+GROUP BY a.author_id
+HAVING COUNT(b.book_id) > 3;
